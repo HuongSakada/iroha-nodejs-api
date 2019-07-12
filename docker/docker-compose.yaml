@@ -1,0 +1,54 @@
+version: '3.5'
+
+networks:
+  iroha-vue-network:
+    name: iroha-vue-network
+    attachable: true
+
+services:
+  iroha-vue:
+    image: hyperledger/iroha:latest
+    container_name: iroha-vue
+    depends_on:
+      - iroha-vue-postgres
+    tty: true
+    environment:
+      - KEY=keys/node0
+    entrypoint:
+      - /opt/iroha_data/entrypoint.sh
+    networks:
+      - iroha-vue-network
+    volumes:
+      - ./iroha:/opt/iroha_data
+    logging:
+      driver: none
+    ports:
+      - 50051:50051
+
+  iroha-vue-postgres:
+    image: postgres:9.5
+    container_name: iroha-vue-postgres
+    environment:
+      - POSTGRES_PASSWORD=mysecretpassword
+    networks:
+      - iroha-vue-network
+    logging:
+      driver: none
+
+  grpcwebproxy:
+    build:
+      context: grpcwebproxy/
+    container_name: iroha-vue-grpcwebproxy
+    depends_on:
+      - iroha-vue
+    entrypoint:
+      - grpcwebproxy
+      - --backend_addr=iroha-vue:50051
+      - --run_tls_server=false
+      - --allow_all_origins=true
+    networks:
+      - iroha-vue-network
+    logging:
+      driver: none
+    ports:
+      - 8081:8080

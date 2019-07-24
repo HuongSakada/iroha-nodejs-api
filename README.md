@@ -1,4 +1,4 @@
-#iroha-nodejs-api
+# iroha-nodejs-api
 
 ## Project setup
 ```

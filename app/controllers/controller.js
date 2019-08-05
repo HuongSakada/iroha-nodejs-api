@@ -24,7 +24,6 @@ const queryService = new QueryService_v1Client(
   grpc.credentials.createInsecure()
 );
 
-
 /**Create account by json req of domainId and accountName key */
 exports.create = (req, res) => {
     const promise = new Promise((resolve, reject) => {
@@ -50,6 +49,7 @@ exports.create = (req, res) => {
     promise.then((account) => {
         return res.status(200).send(account);
     }).catch((err) => {
+        console.error(err);
         return res.status(500).send(err);
     });
 };
@@ -76,6 +76,92 @@ exports.getAccount = (req, res) => {
     promise.then((account) => {
         return res.status(200).send(account);
     }).catch((err) => {
+        console.error(err);
+        return res.status(500).send(err);
+    });
+};
+
+
+//Create asset
+exports.createAsset = (req, res) => {
+    const promise = new Promise((resolve, reject) => {
+        commands.createAsset({
+            privateKeys: [adminPriv],
+            creatorAccountId: username,
+            quorum: 1,
+            commandService,
+            timeoutLimit: 5000
+        }, {
+            assetName: req.body.assetName,
+            domainId: req.body.domainId,
+            precision: req.body.precision
+        })
+        .then((account) => {
+            resolve(account);
+        })
+        .catch((err) => {
+            reject(err);
+        });
+    });
+    
+    promise.then((account) => {
+        return res.status(200).send(account);
+    }).catch((err) => {
+        console.error(err);
+        return res.status(500).send(err);
+    });
+};
+
+exports.addAssetQuantity = (req, res) => {
+    const promise = new Promise((resolve, reject) => {
+        commands.addAssetQuantity({
+            privateKeys: [adminPriv],
+            creatorAccountId: username,
+            quorum: 1,
+            commandService,
+            timeoutLimit: 5000
+        }, {
+            assetId: req.body.assetId,
+            amount: req.body.amount
+        })
+        .then((account) => {
+            resolve(account);
+        })
+        .catch((err) => {
+            reject(err);
+        });
+    });
+    
+    promise.then((account) => {
+        return res.status(200).send(account);
+    }).catch((err) => {
+        console.error(err);
+        return res.status(500).send(err);
+    });
+};
+
+exports.getAccountAssets = (req, res) => {
+    const promise = new Promise((resolve, reject) => {
+        queries.getAccountAssets({
+            privateKey: adminPriv,
+            creatorAccountId: username,
+            queryService,
+            timeoutLimit: 5000
+        }, {
+            accountId: req.params.accountId
+        })
+        .then((account) => {
+            resolve(account);
+        })
+        .catch((err) => {
+            reject(err);
+        });
+    });
+    
+    promise.then((account) => {
+        return res.status(200).send(account);
+    }).catch((err) => {
+        console.error(err);
         return res.status(500).send(err);
     });
 };
